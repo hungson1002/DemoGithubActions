@@ -1,33 +1,32 @@
-name: Build and Push Docker Image
+name: Triển khai ứng dụng lên Docker Hub    # Tên quy trình
 
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]    # Chạy khi có code mới đẩy lên nhánh main
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  build_and_push_docker:
+    runs-on: ubuntu-latest  # Mượn máy ảo Ubuntu của GitHub để chạy
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6
+      - name: Bước 1 - Tải code
+        uses: actions/checkout@v4            # Robot tự động copy code vào máy ảo
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      - name: Bước 2 - Đăng nhập Docker Hub
+        uses: docker/login-action@v3         # Cung cấp tài khoản để đẩy image lên
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Bước 3 - Cài đặt công cụ Buildx
+        uses: docker/setup-buildx-action@v3  # Môi trường cần thiết để build Docker image
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+      - name: Bước 4 - Build và Push Image
+        uses: docker/build-push-action@v5    # Đóng gói và đăng tải sản phẩm lên Docker Hub
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: |
+          tags: |                            # Đặt tên và phiên bản cho Image
             ${{ secrets.DOCKERHUB_USERNAME }}/demo-spring-boot:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/demo-spring-boot:${{ github.sha }}
